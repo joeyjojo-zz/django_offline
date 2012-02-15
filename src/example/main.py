@@ -5,13 +5,12 @@ __author__ = 'jond'
 import os
 import sys
 import subprocess
+import time
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
 
 import wrapper.main
 from django.core import management
-from django.contrib.auth.models import User
-
 
 
 def onetimestartup():
@@ -30,5 +29,8 @@ def onetimestartup():
 if __name__ == "__main__":
     onetimestartup()
     theproc = subprocess.Popen([sys.executable, "manage.py", "runserver"])
-    wrapper.main.start("http://127.0.0.1:8000/admin/")
+    # let the server setup :- Show a splash screen
+    time.sleep(1)
+    wrapper.main.start("http://127.0.0.1:8000/home")
+    print "post"
     #wrapper.main.start("http://www.google.com")

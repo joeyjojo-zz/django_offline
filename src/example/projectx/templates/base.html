@@ -1,0 +1,60 @@
+{% load i18n %}
+<html>
+<head>
+    <title>{% block title %}{% endblock %} - AnyBlog</title>
+
+    <!--
+    <link rel="stylesheet" type="text/css" href="/anyblog/media/css/ui-lightness/jquery-ui-1.8.16.custom.css" media="all" />
+    <link rel="stylesheet" type="text/css" href="/anyblog/media/css/styles.css" media="all" />
+    <script type="text/javascript" src="/anyblog/media/js/lib/jquery-1.7.1.js"></script>
+    <script type="text/javascript" src="/anyblog/media/js/lib/jquery-ui-1.8.16.custom.min.js"></script>
+    <script type="text/javascript" src="/anyblog/media/js/anyblog.js"></script>
+    -->
+    {% block css %}
+    {% endblock %}
+
+    {% block preload_js %}
+    {% endblock %}
+
+    {% block extra-head %}{% endblock %}
+</head>
+
+<body class="ui-widget">
+<div id="bodywrapper">
+    <div id="header" class="ui-widget-header">
+        <div class="">
+            <h1 class="">{%  trans "AnyBlog" %}</h1>
+            <h3 class="">{%  trans "The blog for anyone." %}</h3>
+        </div>
+    </div>
+
+    <div id="contentwrapper" class="ui-widget-header-content">
+        <div id="sidebar" class="sidebar">
+            {% block sidebar %}
+            {% endblock %}
+        </div>
+        <div id="content" class="content ui-widget">
+            <p>Test base</p>
+            {% block content-header %}
+            <div id="error" class="">{{ error }}</div>
+            <div id="info" class="">{{ info }}</div>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endblock %}
+
+            {% block content %}{% endblock %}
+        </div>
+        <div class="clearer"></div>
+    </div>
+
+</div>
+<div id="footer" class="footer">
+    <p>{%  trans "Sample Google App Engine Application" %}</p>
+</div>
+{% block js %}
+{% endblock %}
+</body>
+</html>
