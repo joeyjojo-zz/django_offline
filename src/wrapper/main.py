@@ -37,6 +37,12 @@ def mainloop(app, uri):
     print "in main loop"
     while True:
         app.processEvents()
+        while app.hasPendingEvents():
+            app.processEvents()
+
+            gevent.sleep()
+
+        gevent.sleep() # don't appear to get here but cooperate again
 
 def get_handler(*args, **options):
     """
@@ -77,6 +83,6 @@ def start(uri=None):
     gevent.joinall([gevent.spawn(djangostartup),
                     gevent.spawn(mainloop, app, uri),
                     ])
-
+    #djangostartup()
 
 
