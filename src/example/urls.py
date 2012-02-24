@@ -3,7 +3,7 @@ from django.conf.urls.defaults import patterns, include, url
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 
-from example.projectx.views import HomeView
+from projectx.views import HomeView
 
 admin.autodiscover()
 

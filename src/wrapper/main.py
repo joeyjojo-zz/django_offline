@@ -55,16 +55,6 @@ def djangostartup(*args, **options):
 
     """
     print "in django startup"
-    # Check if database file exists
-    if not os.path.exists(settings.getfullpathtodb()):
-        # TODO: This should be changed to a subprocess and we should communicate to the pipe
-        management.call_command("syncdb")
-        # TODO: Figure out why this didnt work!
-        #user = User.objects.create_user("admin", "a@b.com")
-        #user.is_superuser = True
-        #user.set_password('a')
-        #user.save()
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
     #management.call_command("runserver")
 
     #application = django.core.handlers.wsgi.WSGIHandler()
@@ -73,14 +63,18 @@ def djangostartup(*args, **options):
     handler = get_handler(*args, **options)
     run('', PORT, handler)
 
-def start(uri=None):
+def start(uri=None, dbpath=None):
     """
     Start the QT application
     @param uri: The uri to load in as default (i.e. the home page of the application
     @type uri: str
     """
     app = QtGui.QApplication(sys.argv)
-    gevent.joinall([gevent.spawn(djangostartup),
+    # Check if database file exists
+    if not os.path.exists(dbpath):
+        # TODO: This should be changed to a subprocess and we should communicate to the pipe
+        management.call_command("syncdb")
+    gevent.joinall([gevent.spawn(djangostartup, dbpath=dbpath),
                     gevent.spawn(mainloop, app, uri),
                     ])
     #djangostartup()
