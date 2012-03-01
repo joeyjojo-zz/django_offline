@@ -3,6 +3,10 @@ from PySide import QtGui, QtCore, QtWebKit
 import wrapper.views.gen.webvieww
 
 class WWebView(QtGui.QMainWindow, wrapper.views.gen.webvieww.Ui_MainWindow):
+
+    onclose = QtCore.Signal()
+
+
     def __init__(self, *args):
         QtGui.QMainWindow.__init__(self, None)
         self.setupUi(self)
@@ -14,3 +18,11 @@ class WWebView(QtGui.QMainWindow, wrapper.views.gen.webvieww.Ui_MainWindow):
 
     def setUrl(self, url):
         self.webView.setUrl(QtCore.QUrl(url))
+
+    def closeEvent(self, e):
+        """
+        Called when the window is attempting to close
+        e type: QtGui.QCloseEvent
+        """
+        self.onclose.emit()
+        QtGui.QMainWindow.closeEvent(self, e)

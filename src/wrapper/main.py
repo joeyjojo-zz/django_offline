@@ -4,6 +4,7 @@ Starts up the application
 """
 import time
 
+
 __author__ = 'jond'
 
 import sys
@@ -14,10 +15,11 @@ import gevent
 from django.core import management
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler, run, WSGIServerException
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 from gevent import monkey
+from greenlet import GreenletExit
 
 import views.wwebview
-from example import settings
 
 monkey.patch_all()
 
@@ -34,32 +36,26 @@ def mainloop(app, uri):
     w = views.wwebview.WWebView()
     w.show()
     w.setUrl(uri)
-    print "in main loop"
+    def handle_exit():
+        raise GreenletExit
+    w.onclose.connect(handle_exit)
     while True:
         app.processEvents()
-        while app.hasPendingEvents():
-            app.processEvents()
-
-            gevent.sleep()
-
+        #while app.hasPendingEvents():
+        #    app.processEvents()
+        #    gevent.sleep()
         gevent.sleep() # don't appear to get here but cooperate again
 
 def get_handler(*args, **options):
     """
     Returns the default WSGI handler for the runner.
     """
-    return WSGIHandler()
+    return StaticFilesHandler(WSGIHandler())
 
 def djangostartup(*args, **options):
     """
-
+    Starts up the django server, but in a way we have control over
     """
-    print "in django startup"
-    #management.call_command("runserver")
-
-    #application = django.core.handlers.wsgi.WSGIHandler()
-    #print 'Listening on port %s and on port 843 (flash policy server)' % PORT
-    #SocketIOServer(('', PORT), application, resource="socket.io").serve_forever()
     handler = get_handler(*args, **options)
     run('', PORT, handler)
 
@@ -77,6 +73,3 @@ def start(uri=None, dbpath=None):
     gevent.joinall([gevent.spawn(djangostartup, dbpath=dbpath),
                     gevent.spawn(mainloop, app, uri),
                     ])
-    #djangostartup()
-
-
