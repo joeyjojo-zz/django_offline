@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import django
+from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.http import HttpResponse
 
 __author__ = 'jond'
@@ -28,7 +29,7 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
 
         # Set up the handler
         from django.core.wsgi import get_wsgi_application
-        handler = get_wsgi_application()
+        handler = StaticFilesHandler(get_wsgi_application())
         # Convert the request to a django request
         dj_request = None
         rf = django.test.client.RequestFactory()
