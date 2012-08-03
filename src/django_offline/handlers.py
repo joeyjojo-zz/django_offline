@@ -39,8 +39,8 @@ class FakeReply(QtNetwork.QNetworkReply):
         self.content = dj_response.content
         self.offset = 0
 
-        #self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, "application/json; charset=UTF-8")
-        self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
+        self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, dj_response['Content-Type'])
+        #self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
 
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("readyRead()"))
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("finished()"))
