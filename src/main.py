@@ -18,6 +18,6 @@ if __name__ == '__main__':
     QtCore.pyqtRemoveInputHook()
     win = django_offline.frame.MainWindow()
     win.show()
-    u = QtCore.QUrl('http://127.0.0.1:8000')
+    u = QtCore.QUrl('http://127.0.0.1:8000/admin/')
     win.setUrl(u)
     sys.exit(app.exec_())
