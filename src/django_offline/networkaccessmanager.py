@@ -1,18 +1,16 @@
 # -*- encoding: utf-8 -*-
+__author__ = 'jond'
+
+import urllib
+import urlparse
+
+from PyQt4 import QtNetwork
 import django
 from django.contrib.staticfiles.handlers import StaticFilesHandler
 from django.http import HttpResponse
-
-__author__ = 'jond'
-
-import os
-
-
 import django.test.client
 
 import django_offline.handlers
-
-from PyQt4 import QtCore, QtNetwork
 
 class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
     """
@@ -24,9 +22,12 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         """
         Deal with the request when it comes in
         """
-        if data is None:
-            data = {}
-
+        argd = {}
+        # lets check that data is a dictionary
+        if data is not None:
+            postargs = unicode(data.readAll())
+            argd = urlparse.parse_qs(urllib.unquote_plus(postargs.encode('ascii')).decode('utf-8'),
+                                                         keep_blank_values=True)
         # Set up the handler
         from django.core.wsgi import get_wsgi_application
         handler = StaticFilesHandler(get_wsgi_application())
@@ -35,9 +36,9 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         rf = django.test.client.RequestFactory()
         urlstring = unicode(request.url().toString())
         if operation == QtNetwork.QNetworkAccessManager.PostOperation:
-            dj_request = rf.post(urlstring, data)
+            dj_request = rf.post(urlstring, argd)
         elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
-            dj_request = rf.get(urlstring, data)
+            dj_request = rf.get(urlstring, argd)
         # add the response from django to the reply
         response = handler(dj_request.environ, HttpResponse)
         reply = django_offline.handlers.FakeReply(self, request, operation, response)
