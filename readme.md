@@ -12,6 +12,10 @@ At the moment the default django admin module doesn't work.
 
 Dependencies
 ------------
--Python27
--PyQt4
--Django
+- Python27
+- PyQt4
+- Django
+
+Build
+-----
+python main.py
