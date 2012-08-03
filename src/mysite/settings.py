@@ -1,3 +1,6 @@
+#Django_offline settings for mysite project
+MAIN_URL = 'http://127.0.0.1:8000/polls/'
+
 # Django settings for mysite project.
 
 DEBUG = True
