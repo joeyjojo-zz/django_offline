@@ -1,9 +1,12 @@
 # -*- encoding: utf-8 -*-
+import django
+
 __author__ = 'jond'
 
-import re
-import urlparse
-import urllib
+import os
+
+import django.core.handlers.base
+import django.test.client
 
 import django_offline.handlers
 
@@ -18,9 +21,24 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
     def createRequest(self, operation, request, data):
         """
         Deal with the request when it comes in
-        TODO: Only deals with keyworded get requests in urls not ordered
         """
-        reply = None
+        if data is None:
+            data = {}
+        # Set up the handler
+        handler = django.core.handlers.base.BaseHandler()
+        # Convert the request to a djano request
+        dj_request = None
+        rf = django.test.client.RequestFactory()
+        urlstring = unicode(request.url().toString())
+        if operation == QtNetwork.QNetworkAccessManager.PostOperation:
+            dj_request = rf.post(urlstring, data)
+        elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
+            dj_request = rf.get(urlstring, data)
+        # add the response from django to the reply
+        response = handler.get_response(dj_request)
+        reply = django_offline.handlers.FakeReply(self, request, operation, response)
+        # set up the reply with the correct status
+        #reply.setAttribute(QtNetwork.QNetworkRequest.HttpStatusCodeAttribute, 200)
         if reply is None:
             reply = QtNetwork.QNetworkAccessManager.createRequest(self, operation, request, data)
         return reply
