@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import django
+from django.http import HttpResponse
 
 __author__ = 'jond'
 
@@ -26,7 +27,8 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
             data = {}
 
         # Set up the handler
-        handler = django_offline.handlers.FakeHandler()
+        from django.core.wsgi import get_wsgi_application
+        handler = get_wsgi_application()
         # Convert the request to a django request
         dj_request = None
         rf = django.test.client.RequestFactory()
@@ -36,7 +38,7 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
             dj_request = rf.get(urlstring, data)
         # add the response from django to the reply
-        response = handler.get_response(dj_request)
+        response = handler(dj_request.environ, HttpResponse)
         reply = django_offline.handlers.FakeReply(self, request, operation, response)
         # set up the reply with the correct status
         #reply.setAttribute(QtNetwork.QNetworkRequest.HttpStatusCodeAttribute, 200)
