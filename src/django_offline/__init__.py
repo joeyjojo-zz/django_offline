@@ -15,6 +15,5 @@ def run(start_url):
     # setup the window
     win = django_offline.frame.MainWindow()
     win.show()
-    u = QtCore.QUrl(start_url)
-    #win.setUrl(u)
+    win.setUrl(start_url)
     return app.exec_()

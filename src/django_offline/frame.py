@@ -13,9 +13,10 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         django_offline.forms.MainWindow.Ui_MainWindow.__init__(self)
         self.setupUi(self)
         # add the main tab
-        self.createWebViewTab("Main Tab")
         self.nam = django_offline.networkaccessmanager.NetworkAccessManager(self)
         self.nam.setObjectName('nam')
+        self.createWebViewTab("Main Tab")
+
 
     def createWebViewTab(self, tabtitle):
         tw = WebViewWidget()
@@ -24,6 +25,13 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
             tw.setupNetworkManager(nam)
         self.tabWidget.addTab(tw, tabtitle)
         return tw
+
+    def setUrl(self, url):
+        """
+        Sets the URL of the currently opened tab
+        """
+        self.tabWidget.currentWidget().setUrl(url)
+
 
 class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
     """
@@ -57,5 +65,5 @@ class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
         wv = self.findChild(QtWebKit.QWebView, 'webView')
         if wv:
             webpage = QtWebKit.QWebPage()
-            page.setNetworkAccessManager(nam)
+            webpage.setNetworkAccessManager(nam)
             wv.setPage(webpage)
