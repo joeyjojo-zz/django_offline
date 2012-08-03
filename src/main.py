@@ -18,5 +18,5 @@ if __name__ == '__main__':
     win = django_offline.frame.MainWindow()
     win.show()
     u = QtCore.QUrl('http://127.0.0.1:8000/polls/')
-    win.setUrl(u)
+    #win.setUrl(u)
     sys.exit(app.exec_())
