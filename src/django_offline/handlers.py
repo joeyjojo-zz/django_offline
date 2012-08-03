@@ -2,12 +2,31 @@ __author__ = 'jond'
 
 from PyQt4 import QtCore, QtNetwork
 
+import django.core.handlers.base
+
+class FakeHandler(django.core.handlers.base.BaseHandler):
+    def __init__(self):
+        django.core.handlers.base.BaseHandler.__init__(self)
+        # Set up middleware if needed. We couldn't do this earlier, because
+        # settings weren't available.
+        if self._request_middleware is None:
+            try:
+                # Check that middleware is still uninitialised.
+                if self._request_middleware is None:
+                    self.load_middleware()
+            except:
+                # Unload whatever middleware we got
+                self._request_middleware = None
+                raise
+
+
+
 class FakeReply(QtNetwork.QNetworkReply):
     """
     The reply class that is used when a url is to be dealt with by the application
     and is not to be dealt with by the usual method
     """
-    def __init__(self, parent, request, operation, f, args={}):
+    def __init__(self, parent, request, operation, dj_response):
         """
         @type args: dict
         """
@@ -17,14 +36,10 @@ class FakeReply(QtNetwork.QNetworkReply):
         self.setOperation(operation)
         self.open(self.ReadOnly | self.Unbuffered)
         # if any are lists of 1 item then just send the item through
-        for k, v in args.items():
-            if type(v) is type([]):
-                if len(v) is 1:
-                    args[k] = v[0]
-        self.content = f(**args)
+        self.content = dj_response.content
         self.offset = 0
 
-        self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, "application/json; charset=UTF-8")
+        #self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, "application/json; charset=UTF-8")
         self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
 
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("readyRead()"))

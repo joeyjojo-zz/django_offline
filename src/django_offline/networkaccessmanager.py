@@ -5,7 +5,7 @@ __author__ = 'jond'
 
 import os
 
-import django.core.handlers.base
+
 import django.test.client
 
 import django_offline.handlers
@@ -24,9 +24,10 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         """
         if data is None:
             data = {}
+
         # Set up the handler
-        handler = django.core.handlers.base.BaseHandler()
-        # Convert the request to a djano request
+        handler = django_offline.handlers.FakeHandler()
+        # Convert the request to a django request
         dj_request = None
         rf = django.test.client.RequestFactory()
         urlstring = unicode(request.url().toString())
