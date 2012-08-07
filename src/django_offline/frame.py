@@ -16,6 +16,16 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         self.nam = django_offline.networkaccessmanager.NetworkAccessManager(self)
         self.nam.setObjectName('nam')
         self.createWebViewTab("Main Tab")
+        # hook the frame buttons up
+        self.hookFrameButtons()
+
+    def hookFrameButtons(self):
+        # back button
+        self.backButton.clicked.connect(self.handleBackButtonClicked)
+        # forward button
+        self.nextButton.clicked.connect(self.handleNextButtonClicked)
+        # print button
+        self.printButton.clicked.connect(self.handlePrintButtonClicked)
 
     def createWebViewTab(self, tabtitle):
         """
@@ -90,10 +100,32 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
                 self.backButton.setDisabled(not history.canGoBack())
                 self.nextButton.setDisabled(not history.canGoForward())
 
+    def handlePrintButtonClicked(self):
+        pass
+
+    def handleNextButtonClicked(self):
+        self.currentWebHistory().goToItem(self.currentWebHistory().forwardItem())
+
+    def handleBackButtonClicked(self):
+        """
+        Handle the click of the back button
+        """
+        self.currentWebHistory().goToItem(self.currentWebHistory().backItem())
 
 
     def currentWebWidget(self):
+        """
+        Returns the currently selected tab widget
+        """
         return self.tabWidget.currentWidget()
+
+    def currentWebHistory(self):
+        """
+        Returns the currently select ed
+        """
+        wv = self.currentWebWidget()
+        if wv:
+            return wv.webView.history()
 
 class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
     """
