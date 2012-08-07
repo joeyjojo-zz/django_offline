@@ -22,10 +22,6 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         Creates a tab with a webview in it
         """
         tw = WebViewWidget()
-        # hook up the loading events to the main window
-        tw.loadStarted.connect(self.handlePageLoadStarted)
-        tw.loadProgress.connect(self.handlePageLoadProgress)
-        tw.loadFinished.connect(self.handlePageLoadFinished)
         # set up the page
         nam = self.findChild(django_offline.networkaccessmanager.NetworkAccessManager, "nam")
         if nam:
@@ -33,13 +29,14 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         self.tabWidget.addTab(tw, tabtitle)
         # hook up the tab widget so we know when it has changed
         self.tabWidget.currentChanged.connect(self.handleTabChanged)
+        self.connectTabWidget()
         return tw
 
     def setUrl(self, url):
         """
         Sets the URL of the currently opened tab
         """
-        self.tabWidget.currentWidget().setUrl(url)
+        self.currentWebWidget().setUrl(url)
 
     def setLocationBarText(self, loc):
         """
@@ -47,12 +44,24 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         """
         self.lineEdit.setText(loc)
 
+    def connectTabWidget(self):
+        """
+        Connect tab widget to link widget to main frame
+        """
+        self.setLocationBarText(self.tabWidget.currentWidget().url())
+        # hook up the loading events to the main window
+        wv = self.currentWebWidget()
+        if wv:
+            wv.loadStarted.connect(self.handlePageLoadStarted)
+            wv.loadProgress.connect(self.handlePageLoadProgress)
+            wv.loadFinished.connect(self.handlePageLoadFinished)
+
     def handleTabChanged(self, e):
         """
         When the selected tab changes perform necessary operations
         such as update the url in the location bar
         """
-        self.setLocationBarText(self.tabWidget.currentWidget().url())
+        self.connectTabWidget()
 
     def handlePageLoadStarted(self):
         """
@@ -71,6 +80,20 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         When the page load completes updates the main window
         """
         self.setLocationBarText(self.tabWidget.currentWidget().url())
+        self.backButton.setDisabled(True)
+        self.nextButton.setDisabled(True)
+        # update the buttons states
+        wv = self.currentWebWidget()
+        if wv:
+            history = wv.webView.history()
+            if history:
+                self.backButton.setDisabled(not history.canGoBack())
+                self.nextButton.setDisabled(not history.canGoForward())
+
+
+
+    def currentWebWidget(self):
+        return self.tabWidget.currentWidget()
 
 class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
     """
@@ -125,3 +148,6 @@ class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
             wv.loadStarted.connect(self.loadStarted)
             wv.loadProgress.connect(self.loadProgress)
             wv.loadFinished.connect(self.loadFinished)
+
+    def webView(self):
+        return self.findChild(QtWebKit.QWebView, "webView")
