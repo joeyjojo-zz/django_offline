@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file './django_offline/forms/MainWindow.ui'
+# Form implementation generated from reading ui file 'MainWindow.ui'
 #
-# Created: Fri Aug 03 16:09:31 2012
+# Created: Tue Aug 07 21:30:57 2012
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -24,21 +24,18 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.pushButton_2 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName(_fromUtf8("pushButton_2"))
-        self.horizontalLayout.addWidget(self.pushButton_2)
-        self.pushButton = QtGui.QPushButton(self.centralwidget)
-        self.pushButton.setObjectName(_fromUtf8("pushButton"))
-        self.horizontalLayout.addWidget(self.pushButton)
+        self.backButton = QtGui.QPushButton(self.centralwidget)
+        self.backButton.setObjectName(_fromUtf8("backButton"))
+        self.horizontalLayout.addWidget(self.backButton)
+        self.nextButton = QtGui.QPushButton(self.centralwidget)
+        self.nextButton.setObjectName(_fromUtf8("nextButton"))
+        self.horizontalLayout.addWidget(self.nextButton)
         self.lineEdit = QtGui.QLineEdit(self.centralwidget)
         self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
         self.horizontalLayout.addWidget(self.lineEdit)
-        self.pushButton_3 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName(_fromUtf8("pushButton_3"))
-        self.horizontalLayout.addWidget(self.pushButton_3)
-        self.pushButton_4 = QtGui.QPushButton(self.centralwidget)
-        self.pushButton_4.setObjectName(_fromUtf8("pushButton_4"))
-        self.horizontalLayout.addWidget(self.pushButton_4)
+        self.printButton = QtGui.QPushButton(self.centralwidget)
+        self.printButton.setObjectName(_fromUtf8("printButton"))
+        self.horizontalLayout.addWidget(self.printButton)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
         self.verticalLayout = QtGui.QVBoxLayout()
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
@@ -66,8 +63,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Basic PAYE Tools - RTI", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_2.setText(QtGui.QApplication.translate("MainWindow", "Back", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton.setText(QtGui.QApplication.translate("MainWindow", "Next", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_3.setText(QtGui.QApplication.translate("MainWindow", "Go", None, QtGui.QApplication.UnicodeUTF8))
-        self.pushButton_4.setText(QtGui.QApplication.translate("MainWindow", "Print", None, QtGui.QApplication.UnicodeUTF8))
+        self.backButton.setText(QtGui.QApplication.translate("MainWindow", "Back", None, QtGui.QApplication.UnicodeUTF8))
+        self.nextButton.setText(QtGui.QApplication.translate("MainWindow", "Next", None, QtGui.QApplication.UnicodeUTF8))
+        self.printButton.setText(QtGui.QApplication.translate("MainWindow", "Print", None, QtGui.QApplication.UnicodeUTF8))
 
