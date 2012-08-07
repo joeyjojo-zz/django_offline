@@ -101,14 +101,29 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
                 self.nextButton.setDisabled(not history.canGoForward())
 
     def handlePrintButtonClicked(self):
-        pass
+        """
+        Handle the click of the print button
+        Prints the currently visible tab
+        """
+        printer = QtGui.QPrinter()
+        printDlg = QtGui.QPrintDialog(printer)
+        if printDlg.exec_() == QtGui.QDialog.Rejected:
+            return
+        wv = self.currentWebWidget()
+        if wv:
+            wv.webView.print_(printer)
 
     def handleNextButtonClicked(self):
+        """
+        Handle the click of the forward button
+        Moves the currently selected webview forward a page in the history
+        """
         self.currentWebHistory().goToItem(self.currentWebHistory().forwardItem())
 
     def handleBackButtonClicked(self):
         """
         Handle the click of the back button
+        Moves the currently selected webview back a page in the history
         """
         self.currentWebHistory().goToItem(self.currentWebHistory().backItem())
 
