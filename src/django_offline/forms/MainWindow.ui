@@ -27,7 +27,7 @@
       <item>
        <widget class="QPushButton" name="nextButton">
         <property name="text">
-         <string>Next</string>
+         <string>Forward</string>
         </property>
        </widget>
       </item>
