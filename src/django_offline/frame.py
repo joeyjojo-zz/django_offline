@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui, QtWebKit
+from PyQt4 import QtCore, QtGui, QtWebKit, QtNetwork
 
 import django_offline.forms.MainWindow
 import django_offline.forms.WebView
@@ -15,6 +15,8 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         # add the main tab
         self.nam = django_offline.networkaccessmanager.NetworkAccessManager(self)
         self.nam.setObjectName('nam')
+        self.nam.finished.connect(self.handleNetworkRequestComplete)
+        self.nam.setCookieJar(QtNetwork.QNetworkCookieJar())
         self.createWebViewTab("Main Tab")
         # hook the frame buttons up
         self.hookFrameButtons()
@@ -141,6 +143,21 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         wv = self.currentWebWidget()
         if wv:
             return wv.webView.history()
+
+    def handleNetworkRequestComplete(self, reply):
+        """
+        When a reply is complete n the network access manager
+        we need to handle some things as a temporary solution
+        until dealing with cookies is fixed in PyQt
+        """
+        if reply.cookiestrings:
+            cookiestrings = ['document.cookie = "{0}"'.format(
+                cookiestring
+            ) for cookiestring in reply.cookiestrings]
+
+            for cookiestring in cookiestrings:
+                print 'evaluating javascript', cookiestring
+                self.currentWebWidget().webView.page().mainFrame().evaluateJavaScript(cookiestring)
 
 class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
     """

@@ -12,14 +12,32 @@ class FakeReply(QtNetwork.QNetworkReply):
         @type args: dict
         """
         QtNetwork.QNetworkReply.__init__(self, parent)
+        #import pdb
+        #pdb.set_trace()
+        for i in dj_response.items():
+            self.setRawHeader(i[0],  i[1])
+
         self.setRequest(request)
         self.setOperation(operation)
 
         self.content = dj_response.content
         self.offset = 0
+        # :NOTE: This statement is commented due to a bug in PyQt where the cookie headers can't be set correctly due to
+        # the cookie header expecting QList, but Python Lists are auto-converted to QVariantList, and it is incompatible.
+        # This bug should be fixed in PyQt 4.8, however we need to maintain backward compatibility with 4.7
+        # [WARNING] QNetworkRequest::setHeader: QVariant of type QVariantList cannot be used with header Set-Cookie
+        #self.setHeader(QNetworkRequest.SetCookieHeader, self.m_reply.header(QNetworkRequest.SetCookieHeader))
+        # The following code is an attempted workaround for this issue.
+
+        self.cookies = dj_response.cookies.items()
+        self.cookielist = []
+        if self.cookies:
+            self.cookielist = QtNetwork.QNetworkCookie().parseCookies(','.join([str(c[1]) for c in self.cookies]))
 
         self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, dj_response['Content-Type'])
         self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
+        cookiestrings = [str(c[1]) for c in self.cookies]
+        self.cookiestrings = [cs[12:] for cs in cookiestrings]
 
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("readyRead()"))
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("finished()"))
