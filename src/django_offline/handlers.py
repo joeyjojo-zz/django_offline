@@ -23,15 +23,29 @@ class FakeReply(QtNetwork.QNetworkReply):
         self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, dj_response['Content-Type'])
         #self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
 
+        # get the cookies out thr response
+        #self.cookies = dj_response.cookies.items()
+        #self.cookielist = []
+        #if self.cookies:
+        #    self.cookielist = QtNetwork.QNetworkCookie().parseCookies(','.join([str(c[1]) for c in self.cookies]))
+
+        # save the cookie data
+        #cookiestrings = [str(c[1]) for c in self.cookies]
+        #self.cookiestrings = [cs[12:] for cs in cookiestrings]
 
         # update the attributes as per thos in the django reply
         self.setAttribute(QtNetwork.QNetworkRequest.HttpStatusCodeAttribute, dj_response.status_code)
         self.setAttribute(QtNetwork.QNetworkRequest.CacheLoadControlAttribute, QtNetwork.QNetworkRequest.AlwaysNetwork)
+
+
+
         if dj_response.status_code == 302:
+            #print dj_response['Set-Cookie']
             url = QtCore.QUrl(dj_response['Location'])
-            print url.host()
             url.setHost('127.0.0.1')
             self.setAttribute(QtNetwork.QNetworkRequest.RedirectionTargetAttribute, url)
+
+
         #import pdb
         #pdb.set_trace()
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("readyRead()"))

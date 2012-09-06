@@ -157,9 +157,9 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
             ) for cookiestring in reply.cookiestrings]
 
             for cookiestring in cookiestrings:
-                print 'evaluating javascript', cookiestring
                 self.currentWebWidget().webView.page().mainFrame().evaluateJavaScript(cookiestring)
         """
+
 
 class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
     """

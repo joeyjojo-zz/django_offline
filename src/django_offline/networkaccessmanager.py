@@ -7,10 +7,12 @@ import urlparse
 from PyQt4 import QtNetwork, QtCore
 import django.test
 from django.contrib.staticfiles.handlers import StaticFilesHandler
-from django.http import HttpResponse, SimpleCookie
+from django.http import HttpRequest, SimpleCookie
 import django.test.client
 from django.core.handlers.wsgi import WSGIRequest
 from django.conf import settings
+from django.contrib.auth import authenticate, login
+from django.utils.importlib import import_module
 
 import django_offline.handlers
 
@@ -26,58 +28,35 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         """
         argd = {}
         reply = None
-        """
-        if request.url().host() == '127.0.0.1':
-            # lets check that data is a dictionary
-            if data is not None:
-                postargs = unicode(data.readAll())
-                argd = urlparse.parse_qs(urllib.unquote_plus(postargs.encode('ascii')).decode('utf-8'),
-                                                             keep_blank_values=True)
-            # Set up the handler
-            from django.core.wsgi import get_wsgi_application
-            handler = StaticFilesHandler(get_wsgi_application())
-            print request.header(QtNetwork.QNetworkRequest.CookieHeader)
-            # Convert the request to a django request
-            d={}
-            for cookie in self.cookieJar().cookiesForUrl(QtCore.QUrl('http://127.0.0.1')):
-                d[str(cookie.name())] = str(cookie.value())
-            cookies = SimpleCookie(d)
-            dj_request = None
-            print 'something', cookies
-            print 'nothing', cookies.output(header='', sep='; ')
-            rf = django.test.Client(enforce_csrf_checks=True, Cookie=cookies.output(header='', sep='; '))
-            rf.login(username='jond', password='jond')
-            urlstring = unicode(request.url().toString())
-            if operation == QtNetwork.QNetworkAccessManager.PostOperation:
-                dj_request = rf.post(urlstring, argd, Cookie=cookies.output(header='', sep='; '))
-            elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
-                dj_request = rf.get(urlstring, argd)
-            # transfer the cookies from the cookie jar into the request
-
-
-
-            #print "bar", dj_request.environ
-            # add the response from django to the reply
-            reply = django_offline.handlers.FakeReply(self, request, operation, dj_request)
-            # set up the reply with the correct status
-            reply.setAttribute(QtNetwork.QNetworkRequest.HttpStatusCodeAttribute, dj_request.status_code)
-        """
+        fullheader = ''
         if request.url().host() == '127.0.0.1':
             # retreive the post data
             if data is not None:
                 postargs = unicode(data.readAll())
-                argd = urlparse.parse_qs(urllib.unquote_plus(postargs.encode('ascii')).decode('utf-8'),
-                    keep_blank_values=True)
+                contenttypeheader = str(request.header(QtNetwork.QNetworkRequest.ContentTypeHeader).toString()).split(';')[0]
+
+                if contenttypeheader == 'multipart/form-data':
+                    argd = postargs
+                    fullheader = str(request.header(QtNetwork.QNetworkRequest.ContentTypeHeader).toString())
+                else:
+                    argd = urlparse.parse_qs(urllib.unquote_plus(postargs.encode('ascii')).decode('utf-8'),
+                                             keep_blank_values=True)
+
             # get a handle on the application
             urlstring = unicode(request.url().toString())
             handler = StaticFilesHandler(django.test.client.ClientHandler)
             handler.load_middleware()
             django_request = None
-            rqconv = ConvertedRequest()
+            rqconv = ConvertedRequest(self.cookieJar())
+            rqconv.login(username='jond', password='jond')
             if operation == QtNetwork.QNetworkAccessManager.PostOperation:
-                django_request = rqconv.post(urlstring, argd)
+                import pdb
+                pdb.set_trace()
+
+                django_request = rqconv.post(urlstring, argd, content_type=fullheader)
             elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
                 django_request = rqconv.get(urlstring, argd)
+            print "POST", django_request.POST
             response = handler.get_response(django_request)
 
             reply = django_offline.handlers.FakeReply(self, request, operation, response)
@@ -92,6 +71,12 @@ class ConvertedRequest(object):
     Class that takes a QNetworkRequest and converts it to a
     request type django understands
     """
+    def __init__(self, cookiejar):
+        d={}
+        for cookie in cookiejar.cookiesForUrl(QtCore.QUrl('http://127.0.0.1')):
+            d[str(cookie.name())] = str(cookie.value())
+            #print cookie.name(), cookie.value()
+        self.cookies = SimpleCookie(d)
 
     def _base_environ(self, **request):
         """
@@ -102,7 +87,10 @@ class ConvertedRequest(object):
         # - REMOTE_ADDR: often useful, see #8551.
         # See http://www.python.org/dev/peps/pep-3333/#environ-variables
         environ = {
-            'HTTP_COOKIE':       '',#self.cookies.output(header='', sep='; '), # these need retrieving from the cookiejar
+
+
+
+            'HTTP_COOKIE':       self.cookies.output(header='', sep='; '), # these need retrieving from the cookiejar
             'PATH_INFO':         '/',
             'REMOTE_ADDR':       '127.0.0.1',
             'REQUEST_METHOD':    'GET',
@@ -139,11 +127,13 @@ class ConvertedRequest(object):
         r.update(extra)
         return self.request(**r)
 
-    def post(self, path, data={}, content_type=django.test.client.MULTIPART_CONTENT,
+    def post(self, path, data='', content_type=None,
              **extra):
         "Construct a POST request."
 
-        post_data = self._encode_data(data, content_type)
+        if content_type is None:
+            raise Exception()
+        post_data = data
 
         parsed = urlparse.urlparse(path)
         r = {
@@ -153,6 +143,7 @@ class ConvertedRequest(object):
             'QUERY_STRING':   parsed[4],
             'REQUEST_METHOD': 'POST',
             'wsgi.input':     django.test.client.FakePayload(post_data),
+            '_body': post_data
             }
         r.update(extra)
         return self.request(**r)
@@ -166,7 +157,11 @@ class ConvertedRequest(object):
 
     def _encode_data(self, data, content_type, ):
         if content_type is django.test.client.MULTIPART_CONTENT:
-            return django.test.client.encode_multipart(django.test.client.BOUNDARY, data)
+            print data.keys()
+            print data[' name']
+            dataencode = django.test.client.encode_multipart(django.test.client.BOUNDARY, data)
+            #print 'encoding data', dataencode
+            return dataencode
         else:
             # Encode the content so that the byte representation is correct.
             match = django.test.client.CONTENT_TYPE_RE.match(content_type)
@@ -175,3 +170,44 @@ class ConvertedRequest(object):
             else:
                 charset = settings.DEFAULT_CHARSET
             return django.test.client.smart_str(data, encoding=charset)
+
+    def login(self, **credentials):
+        """
+        Sets the Factory to appear as if it has successfully logged into a site.
+
+        Returns True if login is possible; False if the provided credentials
+        are incorrect, or the user is inactive, or if the sessions framework is
+        not available.
+        """
+        self.session = None
+        user = authenticate(**credentials)
+        if user and user.is_active\
+        and 'django.contrib.sessions' in settings.INSTALLED_APPS:
+            engine = import_module(settings.SESSION_ENGINE)
+
+            # Create a fake request to store login details.
+            request = HttpRequest()
+            if self.session:
+                request.session = self.session
+            else:
+                request.session = engine.SessionStore()
+            login(request, user)
+
+            # Save the session values.
+            request.session.save()
+
+            # Set the cookie to represent the session.
+            session_cookie = settings.SESSION_COOKIE_NAME
+            self.cookies[session_cookie] = request.session.session_key
+            cookie_data = {
+                'max-age': None,
+                'path': '/',
+                'domain': settings.SESSION_COOKIE_DOMAIN,
+                'secure': settings.SESSION_COOKIE_SECURE or None,
+                'expires': None,
+                }
+            self.cookies[session_cookie].update(cookie_data)
+
+            return True
+        else:
+            return False
