@@ -21,11 +21,19 @@ class FakeReply(QtNetwork.QNetworkReply):
 
 
         self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, dj_response['Content-Type'])
-        self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
+        #self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
+
 
         # update the attributes as per thos in the django reply
         self.setAttribute(QtNetwork.QNetworkRequest.HttpStatusCodeAttribute, dj_response.status_code)
-
+        self.setAttribute(QtNetwork.QNetworkRequest.CacheLoadControlAttribute, QtNetwork.QNetworkRequest.AlwaysNetwork)
+        if dj_response.status_code == 302:
+            url = QtCore.QUrl(dj_response['Location'])
+            print url.host()
+            url.setHost('127.0.0.1')
+            self.setAttribute(QtNetwork.QNetworkRequest.RedirectionTargetAttribute, url)
+        #import pdb
+        #pdb.set_trace()
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("readyRead()"))
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("finished()"))
         self.open(self.ReadOnly | self.Unbuffered)
