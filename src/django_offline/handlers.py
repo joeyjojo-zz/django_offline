@@ -12,13 +12,31 @@ class FakeReply(QtNetwork.QNetworkReply):
         @type args: dict
         """
         QtNetwork.QNetworkReply.__init__(self, parent)
+
+        self.setRequest(request)
+        self.setOperation(operation)
+
+        self.content = dj_response.content
+        self.offset = 0
+
+
+        self.setHeader(QtNetwork.QNetworkRequest.ContentTypeHeader, dj_response['Content-Type'])
+        self.setHeader(QtNetwork.QNetworkRequest.ContentLengthHeader, len(self.content))
+
+        # update the attributes as per thos in the django reply
+        self.setAttribute(QtNetwork.QNetworkRequest.HttpStatusCodeAttribute, dj_response.status_code)
+
+        QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("readyRead()"))
+        QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("finished()"))
+        self.open(self.ReadOnly | self.Unbuffered)
+        self.setUrl(request.url())
+        """
         #import pdb
         #pdb.set_trace()
         for i in dj_response.items():
             self.setRawHeader(i[0],  i[1])
 
-        self.setRequest(request)
-        self.setOperation(operation)
+
 
         self.content = dj_response.content
         self.offset = 0
@@ -43,6 +61,7 @@ class FakeReply(QtNetwork.QNetworkReply):
         QtCore.QTimer.singleShot(0, self, QtCore.SIGNAL("finished()"))
         self.open(self.ReadOnly | self.Unbuffered)
         self.setUrl(request.url())
+        """
 
     def abort(self):
         pass

@@ -150,6 +150,7 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
         we need to handle some things as a temporary solution
         until dealing with cookies is fixed in PyQt
         """
+        """
         if reply.cookiestrings:
             cookiestrings = ['document.cookie = "{0}"'.format(
                 cookiestring
@@ -158,6 +159,7 @@ class MainWindow(QtGui.QMainWindow, django_offline.forms.MainWindow.Ui_MainWindo
             for cookiestring in cookiestrings:
                 print 'evaluating javascript', cookiestring
                 self.currentWebWidget().webView.page().mainFrame().evaluateJavaScript(cookiestring)
+        """
 
 class WebViewWidget(QtGui.QWidget, django_offline.forms.WebView.Ui_Form):
     """
