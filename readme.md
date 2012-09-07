@@ -8,7 +8,7 @@ The django app is rendered in a QWebView and you should be able to develop the d
 
 Caveats
 -------
-Deletion does not work
+Currently only supports GET and POST requests. Adding others should be fairly trivial but I haven't done it yet!
 
 Dependencies
 ------------
@@ -20,7 +20,10 @@ Build
 -----
 python main.py
 
+Licence
+-----
+None. Do what you like just don't blame me!
+
 Footnotes
 -----
-
 * specifically 2.7.3. 2.7.2 appears to have a bug in it with cStringIO adding additional white space on reads. 2.7.2 can be made to work by replacing cStringIO with StringIO.
