@@ -3,6 +3,7 @@ __author__ = 'jond'
 
 import urllib
 import urlparse
+import time
 
 from PyQt4 import QtNetwork, QtCore
 import django.test
@@ -26,13 +27,16 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         """
         Deal with the request when it comes in
         """
+        t = time.time()
+        print 'request in', t
         argd = {}
         reply = None
         fullheader = ''
         if request.url().host() == '127.0.0.1':
             # retreive the post data
             if data is not None:
-                postargs = unicode(data.readAll())
+                dataread = data.readAll()
+                postargs = str(dataread) # interesting that we don't unicode it here, but this seems to work
                 contenttypeheader = str(request.header(QtNetwork.QNetworkRequest.ContentTypeHeader).toString()).split(';')[0]
                 if contenttypeheader == 'multipart/form-data':
                     argd = postargs
@@ -63,7 +67,8 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
         if reply is None:
             reply = QtNetwork.QNetworkAccessManager.createRequest(self, operation, request, data)
         reply.ignoreSslErrors()
-
+        to = time.time()
+        print 'request out', to, 'taken', to-t
         return reply
 
 class ConvertedRequest(object):
