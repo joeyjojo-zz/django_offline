@@ -1,3 +1,14 @@
+"""
+This file will:
+
+Compile your python files into an excecutable using:
+
+python setup.py py2exe
+
+This file will not:
+Copy over any templates/css/js etc into the dist folder alongside the exe
+"""
+
 import sys
 import py2exe
 import os
@@ -55,20 +66,18 @@ script_list = [
 
 options = {
     "py2exe": {
-        "packages":["django.db", "django.middleware", "django.contrib", "django.template", "polls"],
+        "packages":["django", "django_offline", "mysite", "polls"],
         "includes": ["sip"],
-        "excludes": ["wx"],
+        "excludes":[],
         "dll_excludes": ["w9xpopen.exe", "MSVCP90.dll"],
     }
 }
 
 zipfile = "python/main.zip"
 
-options["py2exe"]["excludes"].append("Pennant.PennantDebug")
-
 if bundle:
     zipfile = None
-    options["py2exe"]["bundle_files"] = 1
+    options["py2exe"]["bundle_files"] = 2
     
 
 setup(windows=script_list, options=options, zipfile=zipfile)
