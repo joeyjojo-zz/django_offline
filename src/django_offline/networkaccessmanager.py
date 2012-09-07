@@ -34,8 +34,10 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
             if data is not None:
                 postargs = unicode(data.readAll())
                 contenttypeheader = str(request.header(QtNetwork.QNetworkRequest.ContentTypeHeader).toString()).split(';')[0]
-
                 if contenttypeheader == 'multipart/form-data':
+                    argd = postargs
+                    fullheader = str(request.header(QtNetwork.QNetworkRequest.ContentTypeHeader).toString())
+                elif contenttypeheader == 'application/x-www-form-urlencoded':
                     argd = postargs
                     fullheader = str(request.header(QtNetwork.QNetworkRequest.ContentTypeHeader).toString())
                 else:
