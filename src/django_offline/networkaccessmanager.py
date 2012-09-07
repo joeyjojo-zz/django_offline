@@ -50,7 +50,9 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
             handler.load_middleware()
             django_request = None
             rqconv = ConvertedRequest(self.cookieJar())
-            rqconv.login(username='jond', password='jond')
+            # doesn't matter because sqlite is unexcrypted anyway!
+            # currently used because django requires a username and password
+            rqconv.login(username='default', password='default')
             if operation == QtNetwork.QNetworkAccessManager.PostOperation:
                 django_request = rqconv.post(urlstring, argd, content_type=fullheader)
             elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
