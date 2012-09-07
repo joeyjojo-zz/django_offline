@@ -1,5 +1,12 @@
+import os
+
 #Django_offline settings for mysite project
 MAIN_URL = 'http://127.0.0.1:8000/polls/'
+APPDATA_DIR = ''
+try:
+    APPDATA_DIR = os.environ['APPDATA']
+except:
+    APPDATA_DIR = '~'
 
 # Django settings for mysite project.
 
@@ -15,7 +22,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'C:/Users/jond/AppData/Roaming/sqlite3.db', # Or path to database file if using sqlite3.
+        'NAME': os.path.join(APPDATA_DIR, 'sqlite3.db'), # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -110,7 +117,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'D:/projects/django-offline/src/templates',
+    os.path.join(os.getcwd(), 'templates'),
 )
 
 INSTALLED_APPS = (
