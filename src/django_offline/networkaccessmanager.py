@@ -50,13 +50,9 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
             rqconv = ConvertedRequest(self.cookieJar())
             rqconv.login(username='jond', password='jond')
             if operation == QtNetwork.QNetworkAccessManager.PostOperation:
-                import pdb
-                pdb.set_trace()
-
                 django_request = rqconv.post(urlstring, argd, content_type=fullheader)
             elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
                 django_request = rqconv.get(urlstring, argd)
-            print "POST", django_request.POST
             response = handler.get_response(django_request)
 
             reply = django_offline.handlers.FakeReply(self, request, operation, response)
@@ -75,7 +71,6 @@ class ConvertedRequest(object):
         d={}
         for cookie in cookiejar.cookiesForUrl(QtCore.QUrl('http://127.0.0.1')):
             d[str(cookie.name())] = str(cookie.value())
-            #print cookie.name(), cookie.value()
         self.cookies = SimpleCookie(d)
 
     def _base_environ(self, **request):
@@ -157,10 +152,7 @@ class ConvertedRequest(object):
 
     def _encode_data(self, data, content_type, ):
         if content_type is django.test.client.MULTIPART_CONTENT:
-            print data.keys()
-            print data[' name']
             dataencode = django.test.client.encode_multipart(django.test.client.BOUNDARY, data)
-            #print 'encoding data', dataencode
             return dataencode
         else:
             # Encode the content so that the byte representation is correct.
