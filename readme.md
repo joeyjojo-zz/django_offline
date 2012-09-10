@@ -22,7 +22,7 @@ python main.py
 
 Licence
 -----
-None. Do what you like just don't blame me!
+MIT Licence, see MIT-LICENSE.txt
 
 Footnotes
 -----
