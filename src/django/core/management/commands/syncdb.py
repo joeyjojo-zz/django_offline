@@ -23,7 +23,7 @@ class Command(NoArgsCommand):
 
     def handle_noargs(self, **options):
 
-        verbosity = int(options.get('verbosity'))
+        verbosity = int(options.get('verbosity', 1))
         interactive = options.get('interactive')
         show_traceback = options.get('traceback')
 
@@ -52,7 +52,7 @@ class Command(NoArgsCommand):
                 if not msg.startswith('No module named') or 'management' not in msg:
                     raise
 
-        db = options.get('database')
+        db = options.get('database', 'default')
         connection = connections[db]
         cursor = connection.cursor()
 
@@ -160,5 +160,5 @@ class Command(NoArgsCommand):
 
         # Load initial_data fixtures (unless that has been disabled)
         if load_initial_data:
-            from django.core.management import call_command
-            call_command('loaddata', 'initial_data', verbosity=verbosity, database=db)
+            from django.core.management.commands import loaddata
+            loaddata.Command().execute('initial_data', verbosity=verbosity, database=db)
