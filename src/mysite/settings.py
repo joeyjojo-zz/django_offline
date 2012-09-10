@@ -136,6 +136,11 @@ INSTALLED_APPS = (
     'auth_fix',
 )
 
+# Provide a fixtures directory as default django can't load in from default position
+FIXTURE_DIRS = (
+    os.path.join(os.getcwd(), 'fixtures'),
+)
+
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
 # the site admins on every HTTP 500 error when DEBUG=False.
