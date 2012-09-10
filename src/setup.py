@@ -66,7 +66,7 @@ script_list = [
 
 options = {
     "py2exe": {
-        "packages":["django", "django_offline", "mysite", "polls"],
+        "packages":["django", "django_offline", "mysite", "polls", "auth_fix"],
         "includes": ["sip"],
         "excludes":[],
         "dll_excludes": ["w9xpopen.exe", "MSVCP90.dll"],

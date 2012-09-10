@@ -25,4 +25,5 @@ def start_db():
     # setup the database on startup
     # should probably put checks here to make sure we don't do daft things
     # maybe integrate 'south'?
-    call_command('syncdb', interactive=False,)
+    from django.core.management.commands import syncdb
+    syncdb.Command().execute()
