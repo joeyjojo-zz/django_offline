@@ -57,10 +57,10 @@ from distutils.core import setup
 
 script_list = [
     {'script':'%s.py' % 'main',
-     'name':'BPT-RTI',
+     'name':'SAMPLE-APP',
      'version':'0.0.0.1',
      'language':'en-gb',
-     'company_name':'HM Revenue & Customs',
+     'company_name':'defmyfunc.com',
     }
 ]
 
