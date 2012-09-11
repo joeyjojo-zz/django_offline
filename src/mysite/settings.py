@@ -6,7 +6,7 @@ APPDATA_DIR = ''
 try:
     APPDATA_DIR = os.environ['APPDATA']
 except:
-    APPDATA_DIR = '~'
+    APPDATA_DIR = os.path.expanduser('~')
 
 # Django settings for mysite project.
 
