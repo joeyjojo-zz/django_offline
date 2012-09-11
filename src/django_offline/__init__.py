@@ -7,7 +7,7 @@ from django.core.management import call_command
 def run(start_url):
     # set up django settings
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-    # then do django related importas
+    # then do django related imports
     import django_offline.frame
     # set up the database
     start_db()
