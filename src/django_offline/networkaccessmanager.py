@@ -58,6 +58,9 @@ class NetworkAccessManager(QtNetwork.QNetworkAccessManager):
             # currently used because django requires a username and password
             rqconv.login(username='default', password='default')
             if operation == QtNetwork.QNetworkAccessManager.PostOperation:
+                if argd == {}:
+                    # handle empty post data
+                    argd = ''
                 django_request = rqconv.post(urlstring, argd, content_type=fullheader)
             elif operation == QtNetwork.QNetworkAccessManager.GetOperation:
                 django_request = rqconv.get(urlstring, argd)
